@@ -1,0 +1,17 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+
+# editor / tooling local config
+.claude/
+
+# python bytecode (from running the tracer in tests)
+__pycache__/
+*.pyc
+
+# OS / logs
+.DS_Store
+*.log
+npm-debug.log*
