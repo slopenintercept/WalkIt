@@ -432,6 +432,17 @@ def walkit_run(payload_json):
     }
 
     glb = {"ListNode": ListNode, "TreeNode": TreeNode, "Node": Node}
+    # LeetCode's editor implicitly provides typing names (List, Optional, …),
+    # so pasted solutions annotate with them without importing. Mirror that so
+    # `def f(self, nums: List[int]) -> List[int]:` doesn't raise NameError.
+    import typing as _typing
+    for _name in (
+        "List", "Dict", "Set", "Tuple", "Optional", "Union", "Any", "Callable",
+        "Deque", "Iterable", "Sequence", "Mapping", "DefaultDict", "Counter", "FrozenSet",
+    ):
+        if hasattr(_typing, _name):
+            glb[_name] = getattr(_typing, _name)
+
     try:
         code = compile(user_code, "<walkit>", "exec")
     except SyntaxError as e:
@@ -467,16 +478,68 @@ def walkit_run(payload_json):
     return _run_func(p, glb, result)
 
 
+def _is_user_func(v):
+    """A function defined in the user's pasted code (not an injected helper)."""
+    c = getattr(v, "__code__", None)
+    return c is not None and getattr(c, "co_filename", "") == "<walkit>"
+
+
+def resolve_callable(glb, func_name):
+    """Find the function to run, tolerating real-world LeetCode paste shapes:
+    a plain top-level function, a camelCase function, or a method inside a
+    `class Solution`. Matches by exact name, then name ignoring case/underscores,
+    then falls back to the sole candidate."""
+    def norm(s):
+        return s.lower().replace("_", "")
+
+    want = norm(func_name)
+
+    f = glb.get(func_name)
+    if _is_user_func(f):
+        return f
+
+    candidates = []  # (name, callable)
+    for k, v in list(glb.items()):
+        if _is_user_func(v):
+            candidates.append((k, v))
+    for k, v in list(glb.items()):
+        if not isinstance(v, type) or v in (ListNode, TreeNode, Node):
+            continue
+        methods = [
+            mn for mn, mv in vars(v).items()
+            if _is_user_func(mv) and not mn.startswith("_")
+        ]
+        if not methods:
+            continue
+        try:
+            inst = v()
+        except BaseException:
+            continue
+        for mn in methods:
+            candidates.append((mn, getattr(inst, mn)))
+
+    for name, fn in candidates:
+        if name == func_name:
+            return fn
+    for name, fn in candidates:
+        if norm(name) == want:
+            return fn
+    if len(candidates) == 1:
+        return candidates[0][1]
+    return None
+
+
 def _run_func(p, glb, result):
     func_name = p["func"]
     arg_kinds = p["argKinds"]
     ret_kind = p["retKind"]
     args_json = p["args"]
 
-    if func_name not in glb or not callable(glb[func_name]):
+    target = resolve_callable(glb, func_name)
+    if target is None:
         result["error"] = {
             "type": "MissingFunction",
-            "msg": "Define a function named '%s'." % func_name,
+            "msg": "Define a function named '%s' (or a Solution class with that method)." % func_name,
             "line": 0,
         }
         return json.dumps(result)
@@ -487,7 +550,7 @@ def _run_func(p, glb, result):
     had_error = False
     sys.settrace(_global_trace)
     try:
-        ret = glb[func_name](*args)
+        ret = target(*args)
     except StepLimitExceeded:
         result["truncated"] = True
         had_error = True

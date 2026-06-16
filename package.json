@@ -11,7 +11,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node tests/logic.test.mjs && node tests/all_templates.test.mjs",
+    "test": "node tests/logic.test.mjs && node tests/all_templates.test.mjs && node tests/paste.test.mjs",
     "icon": "node scripts/render-icon.cjs",
     "electron": "electron .",
     "electron:dev": "WALKIT_DEV=1 electron .",
