@@ -1,10 +1,7 @@
 name: Build & Release Walk It
 
-# To enable: move this file to .github/workflows/release.yml and push it
-# (that path needs a token with the `workflow` scope — locally run
-#  `gh auth refresh -s workflow`, or add the file via GitHub's web UI).
-# Then cut a release by pushing a tag like v0.1.0, or run it manually from the
-# Actions tab. It builds and attaches macOS / Windows / Linux installers.
+# Cut a release by pushing a tag like v0.1.0, or run it manually from the
+# Actions tab. Builds and attaches macOS / Windows / Linux installers.
 on:
   push:
     tags:

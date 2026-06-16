@@ -45,7 +45,7 @@ npm run app:linux    # Linux .AppImage
 
 Installers land in `release/`. The app icon is `build/icon.svg`; run `npm run icon` to re-render `build/icon.png` (which electron-builder turns into `.icns`/`.ico`).
 
-**Automated cross-platform releases.** A ready-to-use GitHub Actions workflow lives at [`ci/release.yml`](ci/release.yml). To enable it, move it to `.github/workflows/release.yml` and push (that path needs a token with the `workflow` scope — locally: `gh auth refresh -s workflow`, or just add the file through GitHub's web UI). Once enabled, pushing a tag like `v0.1.0` (or running it manually from the Actions tab) builds and attaches macOS / Windows / Linux installers to the matching release.
+**Automated cross-platform releases.** A GitHub Actions workflow at [`.github/workflows/release.yml`](.github/workflows/release.yml) builds and attaches macOS / Windows / Linux installers to a release. Trigger it by pushing a tag like `v0.1.0`, or run it manually from the repo's **Actions** tab.
 
 ## The visual language
 
