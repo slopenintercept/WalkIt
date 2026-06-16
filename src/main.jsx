@@ -8,3 +8,11 @@ createRoot(document.getElementById("root")).render(
     <App />
   </React.StrictMode>
 );
+
+// fade out the launch splash once the app has painted
+requestAnimationFrame(() => {
+  const splash = document.getElementById("splash");
+  if (!splash) return;
+  splash.style.opacity = "0";
+  setTimeout(() => splash.remove(), 450);
+});

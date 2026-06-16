@@ -6,7 +6,24 @@ Paste a (broken) LeetCode-style solution, pick a failing test case, and press **
 
 It ships with **49 problems** (the NeetCode-style set) across ten categories — Arrays & Hashing, Two Pointers, Sliding Window, Stack, Binary Search, Linked List, Trees, Heap, Graphs, and Matrix — each rendered with the data-structure metaphor that fits it (tiles, character pointers, tree/graph platforms, grids, heap pyramids, treasure-chest dicts, and an operation timeline for class-based "design" problems).
 
-## Quick start
+## 📥 Download the app (no setup)
+
+Walk It is also a desktop app with its own icon — nothing to install but the app itself.
+
+1. Go to the [**Releases**](https://github.com/slopenintercept/WalkIt/releases/latest) page.
+2. Download the file for your computer:
+   - **macOS** → `Walk It-*.dmg` — open it and drag **Walk It** to Applications.
+   - **Windows** → `Walk It Setup *.exe` — run it.
+   - **Linux** → `Walk It-*.AppImage` — `chmod +x` it and double-click.
+3. Open **Walk It** from Applications / Start menu. That's it.
+
+> **First-launch note (one time only).** The app is not code-signed (no paid developer certificate), so your OS shows a caution the first time:
+> - **macOS:** right-click the app → **Open** → **Open** (instead of double-clicking). After that it opens normally.
+> - **Windows:** on the blue SmartScreen prompt click **More info → Run anyway**.
+>
+> The app needs an internet connection on first run (it downloads the Python engine, ~10 MB, then caches it).
+
+## Run from source
 
 ```bash
 npm install
@@ -16,6 +33,19 @@ npm run dev
 Open http://localhost:5173. **Network access is required at runtime** — Python runs via [Pyodide](https://pyodide.org) loaded from the jsDelivr CDN (~10 MB, cached after the first visit), and the in-scene text font is also fetched remotely.
 
 Pick a template, press **▶ Run** (each template loads with a classic beginner bug so the flag has something to point at), then scrub the timeline or press play. `load working solution` shows the same scene with the bug fixed.
+
+## Build the desktop app yourself
+
+```bash
+npm run app          # build an installer for your current OS → release/
+npm run app:mac      # macOS .dmg
+npm run app:win      # Windows .exe (NSIS installer)
+npm run app:linux    # Linux .AppImage
+```
+
+Installers land in `release/`. The app icon is `build/icon.svg`; run `npm run icon` to re-render `build/icon.png` (which electron-builder turns into `.icns`/`.ico`).
+
+**Automated cross-platform releases.** A ready-to-use GitHub Actions workflow lives at [`ci/release.yml`](ci/release.yml). To enable it, move it to `.github/workflows/release.yml` and push (that path needs a token with the `workflow` scope — locally: `gh auth refresh -s workflow`, or just add the file through GitHub's web UI). Once enabled, pushing a tag like `v0.1.0` (or running it manually from the Actions tab) builds and attaches macOS / Windows / Linux installers to the matching release.
 
 ## The visual language
 
