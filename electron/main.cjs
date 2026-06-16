@@ -29,6 +29,21 @@ function buildMenu() {
         }]
       : []),
     {
+      // required on macOS for Cmd+C / Cmd+V / Cmd+X / Cmd+A to work in inputs
+      label: "Edit",
+      submenu: [
+        { role: "undo" },
+        { role: "redo" },
+        { type: "separator" },
+        { role: "cut" },
+        { role: "copy" },
+        { role: "paste" },
+        ...(isMac
+          ? [{ role: "pasteAndMatchStyle" }, { role: "delete" }, { role: "selectAll" }]
+          : [{ role: "delete" }, { type: "separator" }, { role: "selectAll" }]),
+      ],
+    },
+    {
       label: "View",
       submenu: [
         { role: "reload" },

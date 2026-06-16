@@ -23,6 +23,7 @@
   "build": {
     "appId": "com.walkit.app",
     "productName": "Walk It",
+    "afterPack": "scripts/afterPack.cjs",
     "directories": {
       "buildResources": "build",
       "output": "release"
