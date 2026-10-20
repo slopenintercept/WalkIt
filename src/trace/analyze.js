@@ -514,5 +514,11 @@ function outputsMatch(template, actual, expected) {
   if (mode === "nested-set" && Array.isArray(actual) && Array.isArray(expected)) {
     return deepSortKey(actual) === deepSortKey(expected);
   }
+  if (mode === "reversible" && Array.isArray(actual) && Array.isArray(expected)) {
+    return (
+      norm(actual) === norm(expected) ||
+      norm([...actual].reverse()) === norm(expected)
+    );
+  }
   return norm(actual) === norm(expected);
 }

@@ -51,6 +51,94 @@ body {
   max-width: 280px;
 }
 
+/* ---------- problem picker ---------- */
+.picker {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.picker-input {
+  background: #1a2138;
+  color: #e8ecf4;
+  border: 1px solid #2a3354;
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 13px;
+  font-family: inherit;
+  width: 250px;
+}
+
+.picker-input:focus {
+  outline: none;
+  border-color: #3d4a7a;
+}
+
+.picker-input::placeholder {
+  color: #6b7ba8;
+}
+
+.picker-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 50;
+  width: 330px;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 4px;
+  background: #141a30;
+  border: 1px solid #2a3354;
+  border-radius: 8px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+}
+
+.picker-group {
+  padding: 8px 8px 4px;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #6b7ba8;
+}
+
+.picker-item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 5px 8px;
+  border-radius: 5px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.picker-item.is-active {
+  background: #253057;
+}
+
+.picker-item.is-current .picker-name {
+  color: #ff8a95;
+}
+
+.picker-lc {
+  flex: 0 0 auto;
+  min-width: 34px;
+  text-align: right;
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+  color: #6b7ba8;
+}
+
+.picker-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.picker-empty {
+  padding: 12px 10px;
+  font-size: 12.5px;
+  color: #6b7ba8;
+}
+
 button.run {
   background: #ff3b4d;
   color: #fff;

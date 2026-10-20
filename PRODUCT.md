@@ -21,7 +21,7 @@ This document is the complete reference: what the product is, who it's for, how 
 11. [Design (class) problems: "ops" mode](#11-design-class-problems-ops-mode)
 12. [The UI: panels, timeline, controls](#12-the-ui-panels-timeline-controls)
 13. [A worked example, end to end](#13-a-worked-example-end-to-end)
-14. [The full 49‑problem catalog](#14-the-full-49-problem-catalog)
+14. [The full 97‑problem catalog](#14-the-full-97-problem-catalog)
 15. [Safety & robustness (the hard‑won bits)](#15-safety--robustness-the-hard-won-bits)
 16. [Extending Walk It](#16-extending-walk-it)
 17. [Testing & verification](#17-testing--verification)
@@ -63,7 +63,7 @@ If an index runs off the end of an array, you don't get `IndexError: list index 
 
 ## 3. The core loop (what a user actually does)
 
-1. **Pick a problem** from the grouped dropdown — 49 problems across 10 categories.
+1. **Pick a problem** from the search picker — 97 problems across 16 categories. Type a LeetCode number, part of a name, or a category to filter.
 2. The editor loads with a **deliberately buggy** default solution (a classic beginner mistake), and the input/expected boxes fill with the first test case.
 3. **Press ▶ Run.** Pyodide executes and traces the code; the scene builds; if the output is wrong (or the code crashes / loops forever), the timeline **auto‑jumps to the divergence step** and a red flag appears.
 4. **Scrub** the timeline (drag, arrow keys, or Play at 3 speeds) to move forward and backward through execution — *time‑travel replay*. The 3D world and the highlighted editor line stay in sync.
@@ -313,6 +313,7 @@ The flag's position is a **verdict**, computed in priority order:
 - `index-pair` — order‑insensitive pair (Two Sum: `[1,0]` ≡ `[0,1]`).
 - `set` — order‑insensitive list (Top K Frequent).
 - `nested-set` — order‑insensitive at both levels (3Sum, Group Anagrams).
+- `reversible` — the array or its reverse (Restore the Array From Adjacent Pairs, where both directions are valid answers).
 
 > **Scope note:** divergence today is verdict‑based, not step‑aligned. Walk It flags *that* the run was wrong and *where it ended/crashed*; it does not yet diff the user's trace against the reference solution's trace to pinpoint the first *internal* step that diverged. Each template already carries a correct `solutionCode`, so a future step‑semantics aligner is the natural next step. See [§20](#20-limitations--future-work).
 
@@ -373,11 +374,11 @@ def two_sum(nums, target):
 
 ---
 
-## 14. The full 49‑problem catalog
+## 14. The full 97‑problem catalog
 
 Every problem ships with a beginner‑buggy default, a correct reference solution, and 2–3 test cases. The first test is always chosen so the **buggy version diverges** on it.
 
-### Arrays & Hashing (7)
+### Arrays & Hashing (12)
 | # | Problem | Renders as | The bug it teaches |
 | --- | --- | --- | --- |
 | 1 | Two Sum | array + dict | inner loop runs one index too far → out‑of‑bounds |
@@ -387,6 +388,11 @@ Every problem ships with a beginner‑buggy default, a correct reference solutio
 | 347 | Top K Frequent Elements | array + dict | sorts ascending → returns the *least* frequent |
 | 238 | Product of Array Except Self | array → array | missing the suffix pass |
 | 128 | Longest Consecutive Sequence | array | duplicates break the run counter |
+| 2672 | Number of Adjacent Elements With the Same Color | grid (queries) + array → array | unpainted cells are all 0, so they count as a match |
+| 896 | Monotonic Array | array | only tests non‑decreasing → rejects a descending array |
+| 560 | Subarray Sum Equals K | array + dict | the empty prefix (sum 0) is never seeded → misses subarrays from index 0 |
+| 1814 | Count Nice Pairs in an Array | array + dict | bumps the tally before the lookup → each number pairs with itself |
+| 3072 | Distribute Elements Into Two Arrays II | array + two dealt arrays → array | a tie on both count *and* length goes to arr2, not arr1 |
 
 ### Two Pointers (4)
 | # | Problem | Renders as | The bug it teaches |
@@ -396,28 +402,37 @@ Every problem ships with a beginner‑buggy default, a correct reference solutio
 | 11 | Container With Most Water | array | moves the taller wall instead of the shorter |
 | 15 | 3Sum | array → triplets | never skips duplicates |
 
-### Sliding Window (3)
+### Sliding Window (7)
 | # | Problem | Renders as | The bug it teaches |
 | --- | --- | --- | --- |
 | 121 | Best Time to Buy/Sell Stock | array (value scan) | `min_price` initialized to 0 instead of ∞ |
 | 3 | Longest Substring Without Repeating | char‑tile string + set | window never shrinks on a repeat |
 | 424 | Longest Repeating Char Replacement | char‑tile string + dict | assumes the whole prefix is replaceable |
+| 1438 | Longest Subarray With Diff Limit | array + two monotonic queues | `>= limit` shrinks a window whose spread is exactly limit |
+| 3034 | Subarrays That Match a Pattern | array + pattern array | the comparisons read backwards → `1` checks the *current* value is bigger |
+| 1052 | Grumpy Bookstore Owner | two arrays (customers + grumpy) | the window never gives anything back → keeps every grumpy minute |
+| 992 | Subarrays With K Distinct | array + dict | at‑most‑k also counts windows with fewer than k distinct |
 
-### Stack (3)
+### Stack (5)
 | # | Problem | Renders as | The bug it teaches |
 | --- | --- | --- | --- |
 | 20 | Valid Parentheses | char‑tile string + stack list | ignores leftover open brackets |
 | 739 | Daily Temperatures | array + stack list | stores absolute index, not the day gap |
 | 155 | Min Stack | **ops** + two stacks | pushes the raw value, not the running min |
+| 71 | Simplify Path | char‑tile string + stack list | pushes `.` as a directory instead of skipping it |
+| 84 | Largest Rectangle in Histogram | array + stack list | width off by one — `i - left`, not `i - left - 1` |
 
-### Binary Search (3)
+### Binary Search (6)
 | # | Problem | Renders as | The bug it teaches |
 | --- | --- | --- | --- |
 | 704 | Binary Search | array | `while l < r` skips single‑element ranges |
 | 33 | Search in Rotated Sorted Array | array | plain binary search ignores the rotation |
 | 153 | Find Minimum in Rotated Sorted Array | array | compares to the left end, not the right |
+| 3161 | Block Placement Queries | grid (queries) + array → list | forgets the free stretch from the last obstacle out to x |
+| 2817 | Minimum Absolute Difference Between Elements With Constraint | array + sorted window | only checks the neighbour right of the insertion point |
+| 2141 | Maximum Running Time of N Computers | array (binary search on the answer) | counts a whole battery → one battery powers every computer at once |
 
-### Linked List (6)
+### Linked List (7)
 | # | Problem | Renders as | The bug it teaches |
 | --- | --- | --- | --- |
 | 206 | Reverse Linked List | platforms + bridges | returns `head` (now the tail) instead of `prev` |
@@ -426,8 +441,9 @@ Every problem ships with a beginner‑buggy default, a correct reference solutio
 | 141 | Linked List Cycle | cyclic chain | single pointer → **infinite loop** (hits the step budget!) |
 | 143 | Reorder List | chain | only reverses; reorder must interleave |
 | 146 | LRU Cache | **ops** + dict chest | `get` doesn't mark the key recently‑used |
+| 2 | Add Two Numbers | two chains → chain | loop ends with a carry still pending → drops the last digit |
 
-### Trees (12)
+### Trees (13)
 | # | Problem | Renders as | The bug it teaches |
 | --- | --- | --- | --- |
 | 104 | Maximum Depth of Binary Tree | tree | forgot the `+ 1` |
@@ -442,6 +458,7 @@ Every problem ships with a beginner‑buggy default, a correct reference solutio
 | 235 | Lowest Common Ancestor of a BST | tree | goes left when it should go right |
 | 572 | Subtree of Another Tree | two‑tree forest | only compares from the root |
 | 1448 | Count Good Nodes | tree | passes the parent value, not the running max |
+| 257 | Binary Tree Paths | tree → list | records a path at every node, not only at the leaves |
 
 ### Heap (3)
 | # | Problem | Renders as | The bug it teaches |
@@ -450,14 +467,17 @@ Every problem ships with a beginner‑buggy default, a correct reference solutio
 | 215 | Kth Largest Element | heap pyramid | `nsmallest` returns the kth *smallest* |
 | 703 | Kth Largest in a Stream | **ops** + heap | never trims to size k → returns the overall min |
 
-### Graphs (3)
+### Graphs (6)
 | # | Problem | Renders as | The bug it teaches |
 | --- | --- | --- | --- |
 | 133 | Clone Graph | graph → graph | never clones the neighbors |
 | 207 | Course Schedule | grid (edge list) | a seen node isn't necessarily a cycle |
 | 210 | Course Schedule II | grid (edge list) → order | reverses a correct topological order |
+| 127 | Word Ladder | char‑tile strings + word list + dict chest | `dist` starts at 0 → counts the hops, not the words |
+| 332 | Reconstruct Itinerary | grid (ticket list) + dict chest → route | tickets are never sorted → takes a bigger airport first |
+| 1743 | Restore the Array From Adjacent Pairs | grid (pair list) + dict chest → array | starts at the first pair, not at an end of the chain |
 
-### Matrix (5)
+### Matrix (12)
 | # | Problem | Renders as | The bug it teaches |
 | --- | --- | --- | --- |
 | 200 | Number of Islands | grid | counts land cells, no flood fill |
@@ -465,6 +485,59 @@ Every problem ships with a beginner‑buggy default, a correct reference solutio
 | 130 | Surrounded Regions | grid → grid | flips border‑connected regions too |
 | 36 | Valid Sudoku | 9×9 grid | never checks the 3×3 boxes |
 | 417 | Pacific Atlantic Water Flow | grid → coords | no flow simulation, only corner cells |
+| 54 | Spiral Matrix | grid → array | `range(left, right)` stops short → skips the last cell of every top row |
+| 723 | Candy Crush | grid → grid | crushes in place, never lets the survivors fall |
+| 3071 | Minimum Operations to Write the Letter Y on a Grid | grid | draws the arms as full diagonals instead of stopping at the centre |
+| 2768 | Number of Black Blocks | grid (coordinates) + dict chest → array | bounds‑checks the cell, not the 2×2 block's corner |
+| 48 | Rotate Image | grid → grid | transposes the whole row → every swap happens twice and cancels |
+| 1861 | Rotating the Box | grid → grid | never clears the square a stone fell from → stones multiply |
+| 733 | Flood Fill | grid → grid | re‑reads the start colour after repainting it → no neighbour matches |
+
+### Strings (8)
+| # | Problem | Renders as | The bug it teaches |
+| --- | --- | --- | --- |
+| 68 | Text Justification | string tiles → array of lines | integer division drops the leftover spaces → short lines |
+| 415 | Add Strings | two char‑tile strings + digit list | loop ends with a carry still pending → drops the leading digit |
+| 3019 | Number of Changing Keys | char‑tile string | compares raw characters → `a` then `A` looks like a key change |
+| 647 | Palindromic Substrings | char‑tile string | only expands odd‑length centres → misses every even palindrome |
+| 3042 | Count Prefix and Suffix Pairs I | string tiles | checks the prefix only, never the suffix |
+| 3043 | Find the Length of the Longest Common Prefix | two arrays + set | `range(1, len(s))` stops short → the whole number is never stored |
+| 3045 | Count Prefix and Suffix Pairs II | string tiles + dict chest | tallies the word before scanning → it pairs with itself |
+| 2023 | Number of Pairs of Strings With Concatenation Equal to Target | string tiles + char‑tile string | `j` starts at `i + 1` → misses the reversed ordered pair |
+
+### Math (5)
+| # | Problem | Renders as | The bug it teaches |
+| --- | --- | --- | --- |
+| 9 | Palindrome Number | variables board | handles even digit counts only → the odd middle digit stays on `rev` |
+| 412 | Fizz Buzz | variables board → string tiles | tests 3 before 15 → a multiple of 15 stops at "Fizz" |
+| 2169 | Count Operations to Obtain Zero | variables board | `ops` is bumped inside the `if` → the else branch never counts |
+| 2544 | Alternating Digit Sum | variables board + digit array | digits peel off the back → signs them right‑to‑left |
+| 539 | Minimum Time Difference | string tiles + array | only compares neighbours → misses the pair across midnight |
+
+### Intervals (4)
+| # | Problem | Renders as | The bug it teaches |
+| --- | --- | --- | --- |
+| 56 | Merge Intervals | grid (intervals) → merged list | assumes the intervals already arrive sorted by start |
+| 253 | Meeting Rooms II | grid (intervals) + heap pyramid | strict `<` keeps a room busy when a meeting ends exactly on time |
+| 435 | Non-overlapping Intervals | grid (intervals) | sorts by earliest start — greedy needs the earliest *end* |
+| 2021 | Brightest Position on Street | grid (lights) + dict chest | turns the light off at `position + range` → darkens the last lit spot |
+
+### Backtracking (1)
+| # | Problem | Renders as | The bug it teaches |
+| --- | --- | --- | --- |
+| 17 | Letter Combinations of a Phone Number | char‑tile string + dict chest → string tiles | never pops the letter → `path` only ever grows |
+
+### Dynamic Programming (1)
+| # | Problem | Renders as | The bug it teaches |
+| --- | --- | --- | --- |
+| 546 | Remove Boxes | array + dict chest (memo) | passes `k` to the merged subproblem instead of `k + 1` |
+
+### Design (3)
+| # | Problem | Renders as | The bug it teaches |
+| --- | --- | --- | --- |
+| 2043 | Simple Bank System | **ops** + balance array | `account < self.n` rejects the last account — they are 1‑indexed |
+| 2502 | Design Memory Allocator | **ops** + memory array | the free‑run counter never resets on a used unit |
+| 1166 | Design File System | **ops** + dict chest | never checks that the parent path exists |
 
 ---
 
@@ -492,12 +565,13 @@ Append an entry to `src/templates.js`:
 {
   id: "my-problem",
   name: "My Problem",
+  lc: 1234,                            // LeetCode number — the picker searches it
   group: "Arrays & Hashing",          // must be one of GROUPS
   func: "solve",
   argNames: ["nums", "k"],
   argKinds: ["list", "value"],         // see kinds below
   retKind: "value",                    // value | list | matrix | tree | linkedlist | graph
-  compare: "exact",                    // exact | index-pair | set | nested-set
+  compare: "exact",                    // exact | index-pair | set | nested-set | reversible
   description: "One‑line description.",
   defaultCode: `def solve(nums, k):\n    ...buggy...`,
   solutionCode: `def solve(nums, k):\n    ...correct...`,
@@ -527,7 +601,7 @@ The tracer almost never needs to change; that's the point of the pipeline.
 `npm test` runs two Node‑side suites that load the **real** `tracer.py` into Node‑side Pyodide and feed traces through the **real** `analyze.js` — no mocks:
 
 - **`tests/logic.test.mjs`** — 21 targeted assertions: out‑of‑bounds detection, caught‑exception handling, the step‑limit kill (including the `try/except` and top‑level‑loop escape attempts), node‑id stability across garbage collection, branch‑truth inference (`if/else`, single‑line bodies, loop exits), value‑scan placement, and recursion depth.
-- **`tests/all_templates.test.mjs`** — sweeps **all 49 templates** (~237 assertions): every buggy default must raise a divergence flag on its first test case, and every reference solution must run clean on *all* its test cases. This is the regression net when adding or editing templates.
+- **`tests/all_templates.test.mjs`** — sweeps **all 97 templates** (477 assertions): every buggy default must raise a divergence flag on its first test case, and every reference solution must run clean on *all* its test cases. This is the regression net when adding or editing templates.
 
 Beyond the unit suites, the build was verified end‑to‑end in a headless Chromium browser driving the real UI: one representative problem per category plus the original suite, screenshot‑reviewed, with zero console/page errors.
 
@@ -560,7 +634,7 @@ src/
   main.jsx                      entry point
   App.jsx                 ~306  state, run flow, panel layout, keyboard, playback
   styles.css                    all styling
-  templates.js                  the 49‑problem catalog (buggy + solution + tests)
+  templates.js                  the 97‑problem catalog (buggy + solution + tests)
 
   pyodide/
     tracer.py             ~560  sys.settrace tracer; input builders; serializers; ops mode
@@ -595,7 +669,7 @@ src/
 
 tests/
   logic.test.mjs                21 targeted analyzer/tracer assertions
-  all_templates.test.mjs        sweeps all 49 templates (~237 assertions)
+  all_templates.test.mjs        sweeps all 97 templates (477 assertions)
 ```
 
 ~5,000 lines of application source. `README.md` is the quick‑start; this file is the deep reference.

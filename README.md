@@ -4,7 +4,9 @@ A visual debugger that renders Python code execution as a walkable, video-game-s
 
 Paste a (broken) LeetCode-style solution, pick a failing test case, and press **Run**. Walk It executes the code step by step in your browser, records every state change, renders it as a game world, and plants a **red flag** at the first step where execution diverges from what was expected — an out-of-bounds index becomes a character walking off the edge of the platform and falling.
 
-It ships with **49 problems** (the NeetCode-style set) across ten categories — Arrays & Hashing, Two Pointers, Sliding Window, Stack, Binary Search, Linked List, Trees, Heap, Graphs, and Matrix — each rendered with the data-structure metaphor that fits it (tiles, character pointers, tree/graph platforms, grids, heap pyramids, treasure-chest dicts, and an operation timeline for class-based "design" problems).
+It ships with **97 problems** across sixteen categories — Arrays & Hashing, Two Pointers, Sliding Window, Stack, Binary Search, Linked List, Trees, Heap, Graphs, Matrix, Strings, Math, Intervals, Backtracking, Dynamic Programming, and Design — each rendered with the data-structure metaphor that fits it (tiles, character pointers, tree/graph platforms, grids, heap pyramids, treasure-chest dicts, and an operation timeline for class-based "design" problems).
+
+The problem picker is a search box: type a LeetCode number (`54`), part of a name (`spiral`), or a category (`matrix`) to filter the whole catalog, then pick with the arrow keys or the mouse.
 
 ## 📥 Download the app (no setup)
 
@@ -168,16 +170,17 @@ npm test
 Two suites run the real tracer in Node-side Pyodide and feed the traces through the real `analyze.js`:
 
 - **`tests/logic.test.mjs`** — 21 targeted assertions: out-of-bounds detection, caught-exception handling, the step-limit kill (including `try/except` and top-level-loop escapes), node-id stability, branch-truth inference (`if/else`, single-line bodies, loop exits), value-scan placement, and recursion depth.
-- **`tests/all_templates.test.mjs`** — sweeps **all 49 templates**: every buggy default must raise a divergence flag on its first test case, and every reference solution must run clean on *all* its test cases (≈237 assertions). This is the regression net for adding or editing templates.
+- **`tests/all_templates.test.mjs`** — sweeps **all 97 templates**: every buggy default must raise a divergence flag on its first test case, and every reference solution must run clean on *all* its test cases (477 assertions). This is the regression net for adding or editing templates.
 
 ### Adding a problem template
 
 Add an entry to `src/templates.js`:
 
+- **Every problem**: `id` (unique slug), `name`, `lc` (LeetCode number — the picker searches it), `group`, and a one-line `description`.
 - **Function problems**: `func`, `argNames`, `argKinds`, `retKind`, an optionally-buggy `defaultCode`, a correct `solutionCode`, and `tests: [{ args, expected }]`.
   - `argKinds`: `list | value | string | matrix | tree | linkedlist | linkedlist_cycle | graph`
   - `retKind`: `value | list | matrix | tree | linkedlist | graph`
-  - `compare`: `exact` (default) | `index-pair` | `set` | `nested-set` (for order-insensitive answers)
+  - `compare`: `exact` (default) | `index-pair` | `set` | `nested-set` (for order-insensitive answers) | `reversible` (the array or its reverse)
   - `render: { heap: [names] }` to draw a list variable as a heap pyramid (defaults cover `heap`/`h`/`pq`)
 - **Design problems**: `mode: "ops"`, `className`, and `tests: [{ ops, opArgs, expected }]` (LeetCode's operation/argument arrays).
 
@@ -185,6 +188,6 @@ Trees, graphs, grids, and heaps need no tracer changes — only a `group` and th
 
 ## Scope and non-goals
 
-Ships: all 49 problems in the list (Python only); arrays, strings, ints, dicts, sets, linked lists, binary trees, graphs, 2-D grids, heaps, and class-based design problems; a synced editor, 3-speed timeline, and the divergence flag + ghost overlay.
+Ships: all 97 problems in the list (Python only); arrays, strings, ints, dicts, sets, linked lists, binary trees, graphs, 2-D grids, heaps, and class-based design problems; a synced editor, 3-speed timeline, and the divergence flag + ghost overlay.
 
 Deliberately out of scope: arbitrary problems (templates only — the tracer needs the input/output shapes), VR/WebXR (the scene graph is plain three.js objects, so a WebXR camera can be swapped in later), accounts/persistence, and smart step-by-step trace alignment against the reference solution (each template already carries a correct solution, ready for a future step-semantics aligner; today divergence is verdict-based — exception / step-limit / wrong-output).

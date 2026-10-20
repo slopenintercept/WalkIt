@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { TEMPLATES, testLabel, GROUPS } from "./templates";
+import { TEMPLATES, testLabel } from "./templates";
 import { ensurePyodide, runTrace } from "./pyodide/runner";
 import { analyze } from "./trace/analyze";
 import EditorPanel from "./components/EditorPanel";
+import ProblemPicker from "./components/ProblemPicker";
 import Scene from "./components/Scene";
 import Timeline from "./components/Timeline";
 
@@ -186,21 +187,7 @@ export default function App() {
     <div className="app">
       <header className="topbar">
         <div className="logo">🚩 Walk It</div>
-        <select
-          value={templateId}
-          onChange={(e) => selectTemplate(e.target.value)}
-          title="problem template"
-        >
-          {GROUPS.map((g) => (
-            <optgroup key={g} label={g}>
-              {TEMPLATES.filter((t) => t.group === g).map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.name}
-                </option>
-              ))}
-            </optgroup>
-          ))}
-        </select>
+        <ProblemPicker template={template} onSelect={selectTemplate} />
         <select
           value={testIdx}
           onChange={(e) => selectTest(Number(e.target.value))}
